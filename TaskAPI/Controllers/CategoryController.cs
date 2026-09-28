@@ -4,9 +4,9 @@ using TaskAPI.Requests;
 using TaskAPI.Services;
 namespace TaskAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;

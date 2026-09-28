@@ -14,51 +14,40 @@ namespace TaskAPI.Controllers;
 public class AuthController : ControllerBase
 {
 
-    public readonly List<UserEntitie> _users = new();
+    public readonly IAuthService _authService;
+
+    public AuthController(IAuthService authService)
+    {
+        _authService = authService;
+    }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-       var userExists = _users.Any(u => u.Email == request.Email);
-        if (userExists)
+       var result = await _authService.RegisterAsync(request);
+        if (result == null)
         {
-            return Conflict(new
+            return BadRequest(new
             {
-                message = "Usuário já cadastrado."
+                message = "Email já cadastrado."
             });
         }
-        var user = new UserEntitie
-        {
-            Email = request.Email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)
-        };
-        _users.Add(user);
-        return Ok("User registered successfully.");
+        return Ok(result);
 
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = _users.FirstOrDefault(u => u.Email == request.Email);
-
-        if(user == null)
+        var result = await _authService.LoginAsync(request);
+        if (result == null)
         {
             return Unauthorized(new
             {
                 message = "Email ou Senha Inválidos."
             });
         }
-
-        var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
-        if(!isPasswordValid)
-        {
-            return Unauthorized(new
-            {
-                message = "Senha Inválida."
-            });
-        }
-        return Ok("Login realizado com sucesso.");
+        return Ok(result);
     }
 
 

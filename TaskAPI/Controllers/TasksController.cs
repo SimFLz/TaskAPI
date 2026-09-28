@@ -5,9 +5,9 @@ using TaskAPI.Requests;
 using TaskAPI.Services;
 namespace TaskAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
-[Authorize]
 public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
@@ -18,6 +18,7 @@ public class TasksController : ControllerBase
         _taskService = taskService;
     }
 
+    
     [HttpGet]
     public async Task<IActionResult> Get()
     {
